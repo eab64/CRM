@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 
 from django.views import generic
@@ -42,7 +42,7 @@ class BookListView(generic.ListView):
     model = Book
     context_object_name = 'book_list'  # ваше собственное имя переменной контекста в шаблоне
     queryset = Book.objects.all() # Получение 5 книг, содержащих слово 'war' в заголовке
-    template_name = 'myapp/book_list.html'
+    paginate_by = 10
     def get_queryset(self):
         return Book.objects.all()
 
@@ -57,12 +57,16 @@ class BookListView(generic.ListView):
 class BookDetailView(generic.ListView):
     model = Book
 
-    def book_detail_view(request, pk):
+    def book_detail_view(request,pk):
         try:
-            book_id = Book.objects.get(pk=pk)
+            book_id=Book.objects.get(id=pk)
         except Book.DoesNotExist:
             raise Http404("Book does not exist")
 
-            # book_id=get_object_or_404(Book, pk=pk)
+        # book_id=get_object_or_404(Book, pk=pk)
 
-        return render(request, 'book_detail.html',context={'book': book_id,})
+        return render(
+            request,
+            'myapp/book_detail.html',
+            context={'book':book_id,}
+        )
